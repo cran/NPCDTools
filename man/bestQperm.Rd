@@ -2,20 +2,25 @@
 % Please edit documentation in R/bestQperm.R
 \name{bestQperm}
 \alias{bestQperm}
-\title{Column permutation of the estimated Q-matrix}
+\title{Column permutation of a Q-matrix with respect to a benchmark Q-matrix.}
 \usage{
-bestQperm(estQ, trueQ)
+bestQperm(Q, bench.Q)
 }
 \arguments{
-\item{estQ}{The estimated Q-matrix.}
+\item{Q}{The targeted Q-matrix.}
 
-\item{trueQ}{The true Q-matrix.}
+\item{bench.Q}{The benchmark Q-matrix.}
 }
 \value{
 The function returns a Q-matrix in which the order of the columns best matches
-that of the true Q-matrix.
+that of the benchmark Q-matrix.
 }
 \description{
-Function \code{bestQperm} is used to rearrange the columns of the estimated Q so that
-the order of the columns best matches that of the true Q-matrix.
+Function \code{bestQperm} is used to permute the columns of a Q-matrix so that
+the order of the columns best matches that of the benchmark Q-matrix. This function
+is useful in a Q-matrix estimation process.
+}
+\examples{
+# See examples used for TSQE.
+
 }

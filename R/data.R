@@ -1,0 +1,26 @@
+#' Q-Matrix from Ozaki (2015)
+#'
+#' A Q-matrix for 30 multiple-choice items measuring 5 attributes,
+#' originally used in Ozaki (2015) to demonstrate structured MC-DINA models.
+#' Items 1--10 are single-attribute items with no coded distractors.
+#' Items 11--20 have one coded distractor each, and items 21--30 have
+#' two or three coded distractors.
+#'
+#' @format A data frame with 66 rows and 7 columns:
+#' \describe{
+#'   \item{V1}{Item index (1--30).}
+#'   \item{V2}{Option index. For each item, the first row is the key;
+#'     subsequent rows are coded distractors.}
+#'   \item{V3}{Attribute 1 indicator (0 or 1).}
+#'   \item{V4}{Attribute 2 indicator (0 or 1).}
+#'   \item{V5}{Attribute 3 indicator (0 or 1).}
+#'   \item{V6}{Attribute 4 indicator (0 or 1).}
+#'   \item{V7}{Attribute 5 indicator (0 or 1).}
+#' }
+#'
+#' @references
+#' Ozaki, K. (2015). DINA models for multiple-choice items with few
+#' parameters: Considering incorrect answers. \emph{Applied Psychological
+#' Measurement}, \emph{39}, 431--447.
+#'
+"Q_Ozaki"

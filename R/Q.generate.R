@@ -1,21 +1,27 @@
-#' @title Generation of Dichotomous Q-Matrix
+#' @title Generation of dichotomous Q-matrix
 #'
 #' @description The function generates a complete Q-matrix based on a
-#'     pre-specified probability of getting a one.
+#'     pre-specified probability that each q-entry equals 1.
 #'
-#' @param K The number of attributes
-#' @param J The number of items
-#' @param p The probability of getting a one in the Q-matrix
-#' @param single.att Whether all the single attribute patterns are included.
-#' If \code{T}, the completeness of the Q-matrix is guaranteed.
+#' @param K The number of attributes.
+#' @param J The number of items.
+#' @param p The probability that each q-entry equals 1.
+#' @param single.att Whether all the single-attribute patterns are included.
+#' If \code{TRUE}, the completeness of the Q-matrix is guaranteed.
 #'
-#' @return The function returns a complete dichotomous Q-matrix
+#' @return The function returns a dichotomous Q-matrix. A complete Q-matrix is the default unless
+#' \code{single.att = F} is specified.
 #'
 #' @export
 #' @examples
-#' q = Q.generate(3,20,0.5,single.att = TRUE)
-#' q1 = Q.generate(5,30,0.6,single.att = FALSE)
-#'
+#' \dontrun{
+#' # Example 1: A complete Q-matrix with items requiring fewer attributes.
+#' Q1 = Q.generate(3, 20, 0.5, single.att = TRUE)
+#' 
+#' # Example 2: A Q-matrix with items requiring more attributes but completeness is not guaranteed.
+#' Q2 = Q.generate(5, 30, 0.6, single.att = FALSE)
+#'}
+#' @seealso \code{\link{Q.completeness}}
 Q.generate = function(K, J, p, single.att = TRUE){
   if (K>J){
     stop("The number of items should be larger than the number of attributes.")

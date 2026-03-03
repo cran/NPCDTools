@@ -4,13 +4,14 @@
 #' were originally misspecified in the provisional Q-matrix. This function is used
 #' only when the true Q-matrix is known.
 #'
-#' @param ref.Q the \eqn{J \times K} binary Q-matrix obtained from applying the refinement procedure.
+#' @param ref.Q The \eqn{J \times K} refined binary Q-matrix.
 #' @param mis.Q A \eqn{J \times K} binary provisional Q-matrix.
 #' @param true.Q The \eqn{J \times K} binary true Q-matrix.
 #'
-#' @return The function returns a value between 0 and 1 indicating the proportion of corrected q-entries in \code{ref.Q}
-#' that were originally missepcified in \code{mis.Q}.
-#'
+#' @return The function returns a value between 0 and 1 representing the proportion of corrected q-entries in \code{ref.Q}
+#' that were originally misspecified in \code{mis.Q}.
+#' @examples
+#' # See examples used for QR function.
 #' @export
 #'
 #'

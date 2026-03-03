@@ -7,8 +7,12 @@
 GNPC(
   Y,
   Q,
-  initial.dis = c("hamming", "whamming"),
-  initial.gate = c("AND", "OR", "Mix")
+  fixed.w = FALSE,
+  initial.dis = "hamming",
+  initial.gate = "AND",
+  max.iter = 1000,
+  tol = 0.001,
+  track.convergence = TRUE
 )
 }
 \arguments{
@@ -18,50 +22,126 @@ from \eqn{N} examinees to \eqn{J} items.}
 \item{Q}{A \eqn{J \times K} binary Q-matrix where the entry \eqn{q_{jk}}
 describing whether the \eqn{k}th attribute is required by the \eqn{j}th item.}
 
-\item{initial.dis}{The type of distance used in the \code{AlphaNP} to carry
+\item{fixed.w}{\code{TRUE} or \code{FALSE}. When \code{TRUE} is specified, fixed weights 
+are used as the initial weights to compute fixed-weight ideal response and there is no 
+need to use NPC to produce the initial values for examinees' attribute profiles. 
+Hence, \code{initial.dis} and \code{initial.gate} are turned off. The default value is \code{FALSE}.}
+
+\item{initial.dis}{The type of distance used in the \code{NPC} to carry
 out the initial attribute profiles for the GNPC method.
 Allowable options are \code{"hamming"} and \code{"whamming"} representing
 the Hamming and the weighted Hamming distances, respectively.}
 
 \item{initial.gate}{The type of relation between examinees' attribute profiles
 and the items.
-Allowable relations are \code{"AND"}, \code{"OR"}, and \code{"Mix"},
-representing the conjunctive, disjunctive, and mixed relations, respectively}
+Allowable relations are "\code{AND}" and "\code{OR}",
+representing the conjunctive and disjunctive relations, respectively.}
+
+\item{max.iter}{Maximum number of iterations allowed. Default is 1000.}
+
+\item{tol}{Convergence tolerance. The algorithm stops when the proportion of
+examinees whose classification changes is less than this value. Default is 0.001.}
+
+\item{track.convergence}{Logical. If \code{TRUE}, convergence information is tracked
+and returned for diagnostic purposes. Default is \code{TRUE}.}
 }
 \value{
-The function returns a series of outputs, including
+The function returns a list with the following components:
 \describe{
-\item{att.est}{The estimates of examinees' attribute profiles}
-\item{class}{The estimates of examinees' class memberships}
-\item{weighted.ideal}{The weighted ideal responses}
-\item{weight}{The weights used to compute the weighted ideal responses}
+\item{att.est}{A \eqn{N \times K} matrix of estimated attribute profiles for examinees}
+\item{class}{A vector of length \eqn{N} containing the estimated class memberships}
+\item{ideal.response}{A \eqn{2^K \times J} matrix of weighted ideal responses}
+\item{weight}{A \eqn{2^K \times J} matrix of weights used to compute the weighted ideal responses}
+\item{convergence}{(Only if \code{track.convergence = TRUE}) A list containing:
+  \itemize{
+    \item \code{iteration}: Vector of iteration numbers
+    \item \code{prop.change}: Proportion of examinees whose classification changed at each iteration
+    \item \code{total.distance}: Total squared distance between observed and weighted ideal responses
+    \item \code{n.iter}: Total number of iterations until convergence
+    \item \code{converged}: Logical indicating whether the algorithm converged within \code{max.iter}
+  }
+}
 }
 }
 \description{
 Function \code{GNPC} is used to estimate examinees' attribute profiles using
-the general nonparametric classification (GNPC) method
-(Chiu, Sun, & Bian, 2018; Chiu & Koehn, 2019). It can be
-used with data conforming to any CDMs.
+    the general nonparametric classification (GNPC) method
+    (Chiu et al., 2018; Chiu & Köhn, 2019). It can be
+    used with data conforming to any cognitive diagnosis models (CDMs).
 }
-\section{GNPC algorithm}{
+\section{Details}{
 
 A weighted ideal response \eqn{\eta^{(w)}}, defined as the convex combination
-of \eqn{\eta^(c)} and \eqn{\eta^(d)}, is proposed.
-Suppose item j requires \eqn{K_{j}^* \leq {K}} attributes that, without loss of
-generality, have been permuted to the first \eqn{K_{j}^*} positions of the item
-attribute vector \eqn{\boldsymbol{q_j}}. For each item j and \eqn{\mathcal{C}_{l}},
-the weighted ideal response \eqn{\eta_{ij}^{(w)}} is defined as the convex combination
-\eqn{\eta_{ij}^{(w)} = w _{lj} \eta_{lj}^{(c)}+(1-w_{lj})\eta_{lj}^{(d)}}
+of \eqn{\eta^{(c)}} and \eqn{\eta^{(d)}}, is used in the GNPC method to compute distances.
+Suppose item \eqn{j} requires \eqn{K_{j}^* \leq {K}} attributes that, without loss of
+generality, have been moved to the first \eqn{K_{j}^*} positions of the item
+attribute vector \eqn{\boldsymbol{q_j}}. For each item \eqn{j} and latent class \eqn{\mathcal{C}_{l}},
+the weighted ideal response \eqn{\eta_{lj}^{(w)}} is defined as the convex combination
+\eqn{\eta_{lj}^{(w)} = w _{lj} \eta_{lj}^{(c)}+(1-w_{lj})\eta_{lj}^{(d)}}
 where \eqn{0\leq w_{lj}\leq 1}. The distance between the observed responses
-to item j and the weighted ideal responses \eqn{w_{lj}^{(w)}} of examinees
+to item \eqn{j} and the weighted ideal responses \eqn{w_{lj}^{(w)}} of examinees
 in \eqn{\mathcal{C}_{l}} is defined as the sum of squared deviations:
-\eqn{d_{lj} = \sum_{i \in \mathcal {C}_{l}} (y_{ij} - \eta_{lj}^{(w)})^2=\sum_{i \in \mathcal {C}_{l}}(y_{ij}-w_{lj}\eta_{lj}^{(c)}-(1-w_{lj})\eta_{lj}^{(d)})}
-Thus, \eqn{\widehat{w_{lj}}} can be minimizing \eqn{d_{lj}}:
-\eqn{\widehat{w_{lj}}=\frac{\sum_{i \in \mathcal {C}_{l}}(y_{ij}-\eta_{lj}^{(d)})}{\left \| \mathcal{C}_{l} \right \|(\eta_{lj}^{(c)}-\eta_{lj}^{(d)})}}
+\eqn{d_{lj} = \sum_{i \in \mathcal {C}_{l}} (y_{ij} - \eta_{lj}^{(w)})^2}. 
+\eqn{\hat{w}_{lj}} can then be obtained by minimizing \eqn{d_{lj}}, which can then be used to compute \eqn{\hat{\eta}_{lj}}. 
 
-As a viable alternative to \eqn{\boldsymbol{\eta^{(c)}}} for obtaining initial
-estimates of the proficiency classes, Chiu et al. (2018) suggested to
-use an ideal response with fixed weights defined as
-\eqn{\eta_{lj}^{(fw)}=\frac{\sum_{k=1}^{K}\alpha_{k}q_{jk}}{K}\eta_{lj}^{(c)}+(1-\frac{\sum_{k=1}^{K}\alpha_{k}q_{jk}}{K})\eta_{lj}^{(d)}}
+After all the \eqn{\hat{\eta}_{lj}} are obtained, examinees' attribute profiles \eqn{\boldsymbol{\alpha}} 
+can be estimated by minimizing the loss function \eqn{\hat{d}_{lj} = \sum_{i \in \mathcal{C}_{l}} (y_{ij} - \hat{\eta}_{lj}^{(w)})^2}
+
+The algorithm iteratively updates the weighted ideal responses and reclassifies
+examinees until convergence is achieved. The stopping criterion is based on the proportion
+of examinees whose classification changes between consecutive iterations:
+\eqn{\frac{\sum_{i=1}^{N} I\left[\alpha_i^{(t)} \neq \alpha_i^{(t-1)}\right]}{N} < \epsilon}{
+     sum_{i=1}^N I[alpha_i^(t) != alpha_i^(t-1)]/N < epsilon
+}
+where \eqn{\epsilon}{} is the tolerance level (default = 0.001).
+
+
+The default initial values of \eqn{\boldsymbol{\alpha}} are obtained by using the NPC method. Chiu et al. (2018)
+suggested another viable alternative for obtaining initial estimates of the proficiency classes by
+using an ideal response with fixed weights defined as
+\eqn{\eta_{lj}^{(fw)}=\frac{\sum_{k=1}^{K}\alpha_{k}q_{jk}}{K}\eta_{lj}^{(c)}+(1-\frac{\sum_{k=1}^{K}\alpha_{k}q_{jk}}{K})\eta_{lj}^{(d)}}.
 }
 
+\examples{
+\dontrun{
+# Example 1: Basic usage
+library(GDINA)
+set.seed(123)
+N <- 500
+Q <- sim30GDINA$simQ
+gs <- data.frame(guess = rep(0.2, nrow(Q)), slip = rep(0.2, nrow(Q)))
+sim <- simGDINA(N, Q, gs.parm = gs, model = "DINA")
+Y <- extract(sim, what = "dat")
+alpha <- extract(sim, what = "attribute")
+
+# Analyze data using GNPC
+result <- GNPC(Y, Q, initial.dis = "hamming", initial.gate = "AND")
+
+# View results
+head(result$att.est)
+table(result$class)
+
+# Plot overall convergence 
+plot(result)
+
+# Plot individual examinee's convergence
+plot(result, type = "individual", examinee.id = 1, true.alpha = alpha[1, ])
+
+# Check attribute agreement rate
+PAR(alpha, result$att.est)
+AAR(alpha, result$att.est)
+
+# Example 2: Without convergence tracking (Convergence tracking is only used for the GNPC plots.)
+result2 <- GNPC(Y, Q, track.convergence = FALSE)
+}
+
+
+}
+\references{
+programs: The general nonparametric classification method. \emph{Psychometrika},
+  \emph{83}(2), 355--375.
+  \doi{10.1007/s11336-017-9595-4}
+
+  classification method. \emph{Psychometrika}, \emph{84}(3), 830--845.
+\doi{10.1007/s11336-019-09660-x}
+}

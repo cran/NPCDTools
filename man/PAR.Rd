@@ -18,3 +18,9 @@ The function returns the pattern-wise agreement rate between two sets of attribu
 The function is used to compute the pattern-wise agreement rate between two sets of
 attribute profiles. They need to have the same dimensions.
 }
+\examples{
+# see examples used for GNPC.
+}
+\seealso{
+\code{\link{AAR}}
+}

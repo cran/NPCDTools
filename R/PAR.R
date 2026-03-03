@@ -7,7 +7,9 @@
 #' @param y The other set of attribute profiles
 #'
 #' @return The function returns the pattern-wise agreement rate between two sets of attribute profiles.
-#'
+#' @seealso \code{\link{AAR}}
+#' @examples
+#' # see examples used for GNPC.
 #' @export
 #'
 PAR = function(x, y) {

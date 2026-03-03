@@ -2,58 +2,89 @@
 % Please edit documentation in R/QR.R
 \name{QR}
 \alias{QR}
-\title{Refine the Q-matrix by Minimizing the RSS}
+\title{Q-matrix refinement method}
 \usage{
 QR(Y, Q, gate = c("AND", "OR"), max.ite = 50)
 }
 \arguments{
-\item{Y}{A matrix of binary responses (1=correct, 0=incorrect). Rows
+\item{Y}{A \eqn{N\times J} matrix of binary responses (1=correct, 0=incorrect). Rows
 represent persons and columns represent items.}
 
-\item{Q}{The Q-matrix of the test. Rows represent items and columns
+\item{Q}{A \eqn{J\times K} provisional Q-matrix to be refined. Rows represent items and columns
 represent attributes.}
 
-\item{gate}{A string, "AND" or "OR". "AND": the examinee needs to possess
-all related attributes to answer an item correctly.
-"OR": the examinee needs to possess only one of the related attributes
-to answer an item correctly.}
+\item{gate}{A string, "\code{AND}" or "\code{OR}". "\code{AND}" is specified when a conjunctive 
+relation between the attributes an examinee possesses and the attributes required by an item is assumed. 
+"\code{OR}" is specified when a disjunctive relation between the attributes an examinee possesses  
+and the attributes required by an item is assumed.}
 
-\item{max.ite}{The number of iterations to run until all RSS of all items
+\item{max.ite}{The number of iterations to run until the RSS's of all items
 are stationary.}
 }
 \value{
 A list containing:
-\item{initial.class}{Initial classification}
-\item{terminal.class}{Terminal classification}
+\item{initial.class}{Initial classifications of examinees}
+\item{terminal.class}{Terminal classification of examinees}
 \item{modified.Q}{The modified Q-matrix}
 \item{modified.entries}{The modified q-entries}
 }
 \description{
-We estimate memberships using the non-parametric classification
-method (weighted hamming), and comparisons of the residual sum of squares
-computed from the observed and the ideal item responses.
+The \code{QR} function refines a provisional Q-matrix by minimizing the residual sum of squares (RSS)
+    between the observed and ideal item responses across all possible q-vectors, given the estimates of
+    examinees' attribute profiles.
 }
-\section{The Q-Matrix Refinment (QR) Method}{
+\details{
+This function implements the Q-matrix refinement (QR) method developed by Chiu
+(2013). The NPC method (Chiu & Douglas, 2013) is first used to classify examinees and the best q-vector
+for an item is identified by minimizing its RSS. Specifically, the RSS of 
+item \eqn{j}{} for examinee \eqn{i}{} is defined as
+\deqn{RSS_{j} =\sum_{m=1}^{2^K} \sum_{i \in C_{m}} (Y_{ij} - \eta_{jm})^2,}{}
+where \eqn{C_m}{} for \eqn{m = 1, \ldots, 2^K} is the \eqn{m}{}th proficiency class, and \eqn{N}{}
+is the number of examinees. Chiu (2013) proved that the expected value of
+\eqn{RSS_j}{} corresponding to the correct q-vector is the minimum among the
+\eqn{2^K - 1}{} candidates.
+}
+\examples{
+\dontrun{
+## Generate data
+library(GDINA)
+N = 500
+Q = sim30GDINA$simQ
+J = nrow(Q)
+K= ncol(Q)
+gs = data.frame(guess = rep(0.2,J), slip = rep(0.2,J))
+sim = simGDINA(N, Q, gs.parm = gs, model = "DINA")
+Y = extract(sim,what = "dat")
 
-
-This function implements the Q-matrix refinement method developed by Chiu
-(2013), which is also based on the aforementioned nonparametric classification
-methods (Chiu & Douglas, 2013). This Q-matrix refinement method corrects
-potential misspecified entries of the Q-matrix through comparisons of the
-residual sum of squares computed from the observed and the ideal item responses.
-
-The algorithm operates by minimizing the RSS. Recall that \eqn{Y_{ij}} is the
-observed response and \eqn{\eta_{ij}} is the ideal response.
-Then the RSS of item \eqn{j} for examinee \eqn{i} is defined as
-\deqn{RSS_{ij} = (Y_{ij} - \eta_{ij})^2}.
-The RSS of item \eqn{j} across all examinees is therefor
-\deqn{RSS_{j} = \sum_{i=1}^{N} (Y_{ij} - \eta_{ij})^2 = \sum_{m=1}^{2^k} \sum_{i \in C_{m}} (Y_{ij} - \eta_{jm})^2}
-where \eqn{C_m} is the latent proficiency-class \eqn{m}, and \eqn{N}
-is the number of examinees. Chiu(2013) proved that the expectation of
-\eqn{RSS_j} is minimized for the correct q-vector among the
-\eqn{2^K - 1} candidates. Please see the paper for the justification.
+## Randomly generate a misspecified Q with 20\% of misspecifications
+mis.Q = matrix(0, J, K)
+while (any(rowSums(mis.Q)==0)==T){
+  mis.q = sample(J*K, J*K*0.2) ## percentage of misspecified q
+  ind = arrayInd(mis.q, dim(Q))
+  mis.Q = Q
+  mis.Q[ind] = 1-mis.Q[ind]
 }
 
+## Refine the misspecified Q-matrix
+ref = QR(Y, mis.Q)
+ref.Q = ref$modified.Q
+
+## Compute the entry-wise and item-wise recovery rates
+rr = RR(ref.Q, Q)
+rr$entry.wise
+rr$item.wise
+
+## Compute the retention rate
+retention.rate(ref.Q, mis.Q, Q)
+
+## Compute the correction rate
+correction.rate(ref.Q, mis.Q, Q)
+}
+}
 \references{
-Chiu, C. Y. (2013). Statistical Refinement of the Q-matrix in Cognitive Diagnosis. \emph{Applied Psychological Measurement, 37(8)}, 598-618.
+Chiu, C. Y. (2013). Statistical Refinement of the Q-matrix in Cognitive Diagnosis. \emph{Applied Psychological Measurement, 37}(8), 598-618.
+\doi{10.1177/0146621613488436}
+}
+\seealso{
+\code{\link{NPC}}
 }

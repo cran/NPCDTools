@@ -7,7 +7,7 @@
 retention.rate(ref.Q = ref.Q, mis.Q = mis.Q, true.Q = true.Q)
 }
 \arguments{
-\item{ref.Q}{the \eqn{J \times K} binary Q-matrix obtained from applying a refinement procedure.}
+\item{ref.Q}{The \eqn{J \times K} refined binary Q-matrix.}
 
 \item{mis.Q}{A \eqn{J \times K} binary provisional Q-matrix.}
 
@@ -22,4 +22,7 @@ after a Q-matrix refinement procedure is applied to \code{mis.Q}.
 This function computes the proportion of correctly specified q-entries
 in a provisional Q-matrix that remain correctly specified after a Q-matrix refinement
 procedure is applied. This function is used only when the true Q-matrix is known.
+}
+\seealso{
+See examples used for \code{\link{QR}}.
 }

@@ -4,7 +4,7 @@
 #' in a provisional Q-matrix that remain correctly specified after a Q-matrix refinement
 #' procedure is applied. This function is used only when the true Q-matrix is known.
 #'
-#' @param ref.Q the \eqn{J \times K} binary Q-matrix obtained from applying a refinement procedure.
+#' @param ref.Q The \eqn{J \times K} refined binary Q-matrix.
 #' @param mis.Q A \eqn{J \times K} binary provisional Q-matrix.
 #' @param true.Q The \eqn{J \times K} binary true Q-matrix.
 #'
@@ -13,7 +13,7 @@
 #' after a Q-matrix refinement procedure is applied to \code{mis.Q}.
 #'
 #' @export
-#'
+#' @seealso See examples used for \code{\link{QR}}.
 #'
 retention.rate = function(ref.Q = ref.Q, mis.Q = mis.Q, true.Q = true.Q)
 {

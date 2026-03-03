@@ -2,23 +2,26 @@
 % Please edit documentation in R/RR.R
 \name{RR}
 \alias{RR}
-\title{Entry-wise and vector-wise recovery rates}
+\title{Entry-wise and vector-wise agreement rate between two Q-matrices}
 \usage{
 RR(Q1, Q2)
 }
 \arguments{
 \item{Q1}{The first Q-matrix.}
 
-\item{Q2}{The second Q-matrix that has the same dimensionality as Q1.}
+\item{Q2}{The second Q-matrix that has the same dimensionality as \code{Q1}.}
 }
 \value{
 The function returns
 \describe{
-\item{entry.wise}{The entry-wise recovery rate}
-\item{item.wise}{The item-wise recovery rate}
+\item{entry.wise}{The entry-wise agreement rate}
+\item{item.wise}{The item-wise agreement rate}
 }
 }
 \description{
-Function \code{RR} is used to compute the recovery rates for an estimate Q-matrix.
-In general, it can be used to compute the agreement rate between two matrices with identical dimensionalities.
+\code{RR} is used to compute the agreement rate between two Q-matrices with 
+identical dimensions.
+}
+\seealso{
+See the examples for the \code{\link{QR}} and \code{\link{TSQE}} functions.
 }
